@@ -1,0 +1,41 @@
+version: '3'
+
+volumes:
+  data:
+    external:
+      name: 'jcug_data_volume'
+
+services:
+  dockertest:
+    container_name: ApiTest
+    image: dockertest
+    build:
+      context: .
+    ports:
+      - '8000:80'
+    networks:
+      - jcug-network
+    depends_on:
+    - 'mongodbjcug'
+
+  mongodbjcug:
+    container_name: MongoServer
+    image: mongo:3.6.8
+    ports:
+      - '27017:27017'
+    restart: 
+      always
+    volumes:
+      - data:/data/db
+  rabbitmq:
+        container_name: RabbitMq
+        ports:
+            - '6672:5672'
+            - '15672:15672'
+        environment:
+            - RABBITMQ_DEFAULT_USER=testes
+            - RABBITMQ_DEFAULT_PASS=Testes2018!
+        image: 'rabbitmq:3-management-alpine'
+networks: 
+    jcug-network:
+        driver: bridge
